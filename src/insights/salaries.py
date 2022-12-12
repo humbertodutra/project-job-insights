@@ -2,6 +2,28 @@ from typing import Union, List, Dict
 from src.insights.jobs import read
 
 
+def validate_salary_parameter(job: Dict) -> None:
+    if "min_salary" not in job or "max_salary" not in job:
+        raise ValueError("Salary is not valid")
+
+    min_salary, max_salary = job["min_salary"], job["max_salary"]
+
+    if (not type(min_salary) == int and not str(min_salary).isnumeric()) or (
+        not type(max_salary) == int and not str(max_salary).isnumeric()
+    ):
+        raise ValueError("Salary is not valid")
+
+    if int(min_salary) > int(max_salary):
+        raise ValueError("min_salary must be less than max_salary")
+
+
+def validate_job_salary_parameter(salary: Dict) -> None:
+    if type(salary) is not int and type(salary) is not str:
+        raise ValueError("Salary is not valid")
+    if type(salary) is str and not salary.isnumeric():
+        raise ValueError("Salary is not valid")
+
+
 def get_max_salary(path: str) -> int:
     data = read(path)
     max_salary = []
@@ -21,29 +43,9 @@ def get_min_salary(path: str) -> int:
 
 
 def matches_salary_range(job: Dict, salary: Union[int, str]) -> bool:
-    """Checks if a given salary is in the salary range of a given job
-
-    Parameters
-    ----------
-    job : dict
-        The job with `min_salary` and `max_salary` keys
-    salary : int
-        The salary to check if matches with salary range of the job
-
-    Returns
-    -------
-    bool
-        True if the salary is in the salary range of the job, False otherwise
-
-    Raises
-    ------
-    ValueError
-        If `job["min_salary"]` or `job["max_salary"]` doesn't exists
-        If `job["min_salary"]` or `job["max_salary"]` aren't valid integers
-        If `job["min_salary"]` is greather than `job["max_salary"]`
-        If `salary` isn't a valid integer
-    """
-    raise NotImplementedError
+    validate_salary_parameter(job)
+    validate_job_salary_parameter(salary)
+    return int(job["min_salary"]) <= int(salary) <= int(job["max_salary"])
 
 
 def filter_by_salary_range(
@@ -65,3 +67,5 @@ def filter_by_salary_range(
         Jobs whose salary range contains `salary`
     """
     raise NotImplementedError
+
+
